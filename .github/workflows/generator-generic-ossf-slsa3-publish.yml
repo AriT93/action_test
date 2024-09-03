@@ -50,6 +50,7 @@ jobs:
           # List the artifacts the provenance will refer to.
           # Generate the subjects (base64 encoded).
           echo "hashes=$(sha256sum hello_world.tar.bz2 | base64 -w0)" >> "$GITHUB_OUTPUT"
+
       - name: Upload artifact1
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3.1.0
         with:
@@ -66,16 +67,16 @@ jobs:
       contents: write # To add assets to a release.
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
     with:
-      continue-on-error: true
       compile-generator: true
       base64-subjects: "${{ needs.build.outputs.hashes }}"
       upload-assets: true # Optional: Upload to a new release
+
   release:
     needs: [build, provenance]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - name: Download artifact1
+      - name: Download hello_world.tar.bz2
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
         with:
           name: hello_world.tar.bz2
