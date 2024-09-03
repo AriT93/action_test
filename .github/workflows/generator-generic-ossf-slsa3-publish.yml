@@ -62,5 +62,5 @@ jobs:
     with:
       continue-on-error: true
       compile-generator: true
-      base64-subjects: "${{ needs.build.outputs.digests }}"
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
       upload-assets: true # Optional: Upload to a new release
