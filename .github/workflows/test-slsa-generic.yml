@@ -72,7 +72,7 @@ jobs:
           name: artifact2
 
       - name: Upload assets
-        uses: softprops/action-gh-release@2.0.8
+        uses: softprops/action-gh-release@2
         with:
           files: |
             artifact1
