@@ -54,3 +54,52 @@ jobs:
       base64-subjects: "${{ needs.build.outputs.hashes }}"
       # Upload provenance to a new release
       upload-assets: true
+      provenance-name: actions_test.intoto.jsonl
+
+  verification-with-slsa-verifier:
+    needs: [ provenance ]
+    runs-on: ubuntu-latest
+    permissions: read-all
+    steps:
+      - name: Install the verifier
+        uses: slsa-framework/slsa-verifier/actions/installer@3714a2a4684014deb874a0e737dffa0ee02dd647 # pin@v2.6.0
+
+      - name: Download assets
+        env:
+          PROVENANCE: "${{ needs.provenance.outputs.provenance-name }}"
+        run: |
+          set -euo pipefail
+          gh -R "$GITHUB_REPOSITORY" release download "$GITHUB_REF_NAME" \
+            -p "$PROVENANCE" -p "artifact1"  -p "artifact2"
+
+      - name: Verify assets
+        env:
+          PROVENANCE: "${{ needs.provenance.outputs.provenance-name }}"
+        run: |
+          slsa-verifier verify-artifact \
+            --provenance-path "$PROVENANCE" \
+            --source-uri "github.com/$GITHUB_REPOSITORY" \
+            --source-tag "$GITHUB_REF_NAME" \
+            artifact1 artifact 2
+
+  # This step uploads our artifacts to the tagged GitHub release.
+  # release:
+  #   needs: [build, provenance]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download artifact1
+  #       uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
+  #       with:
+  #         name: artifact1
+
+  #     - name: Download artifact2
+  #       uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
+  #       with:
+  #         name: artifact2
+
+  #     - name: Upload assets
+  #       uses: softprops/action-gh-release@69320dbe05506a9a39fc8ae11030b214ec2d1f87 # v2.0.5
+  #       with:
+  #         files: |
+  #           artifact1
+  #           artifact2
