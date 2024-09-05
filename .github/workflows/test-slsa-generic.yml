@@ -89,7 +89,7 @@ jobs:
             --provenance-path "$PROVENANCE" \
             --source-uri "github.com/$GITHUB_REPOSITORY" \
             --source-tag "$GITHUB_REF_NAME" \
-            artifact1 artifact 2
+            artifact1 artifact2
 
   # This step uploads our artifacts to the tagged GitHub release.
   # release:
